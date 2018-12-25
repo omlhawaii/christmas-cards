@@ -8,8 +8,9 @@
                 background-repeat: no-repeat;
                 background-size: cover;
                 background-position: center center;
-                animation: bkg 5s infinite;
                 height: 100vh;
+                background-image: url('image(0).jpg');
+                /*animation: bkg 5s infinite;*/
             }
             h2 {
                 position: absolute;
@@ -28,6 +29,7 @@
                 display: block;
                 position: absolute;
                 top: 0;
+                z-index: -1;
             }
 
             .swing {
@@ -85,11 +87,16 @@
                 }
             }
         </style>
+        <link rel="preload" href="image(0).jpg" as="image" />
+        <link rel="preload" href="image(1).jpg" as="image" />
+        <link rel="preload" href="image(2).jpg" as="image" />
+        <link rel="preload" href="image(3).jpg" as="image" />
+        <link rel="preload" href="image(4).jpg" as="image" />
+        <link rel="preload" href="image(5).jpg" as="image" />
     </head>
     <body>
-        <audio autoplay="autoplay">
-            <source src="mele_kalikimaka.mp3" type="audio/mpeg">
-        </audio>
+        <audio><source src="mele_kalikimaka.mp3" type="audio/mpeg" /></audio>
+        <button class="play-button" hidden>▶ Play music</button>
         <h2>
             😊☃️ Mele Kalikimaka and Happy Holidays<br />
             from Oakes Management 🎅🎄
@@ -427,7 +434,7 @@
             }
 
             createSnowflakes() {
-                const flakes = window.innerWidth / 4;
+                const flakes = parseInt(window.innerWidth / 4, 10);
                 this.snowflakes = new Array(flakes)
                     .fill(null)
                     .map(() => new Snowflake());
@@ -458,5 +465,34 @@
                 requestAnimationFrame(this.update);
             }
         }();
+
+        (function switchBackground() {
+            const backgrounds = Array.from(
+                document.querySelectorAll('link[rel="preload"]'),
+                link => `url('${link.getAttribute('href')}')`
+            );
+
+            let i = 0;
+            function nextBackground() {
+                requestAnimationFrame(() => {
+                    document.body.style.backgroundImage =
+                        backgrounds[(i = ++i % backgrounds.length)];
+                });
+                setTimeout(nextBackground, 1000);
+            }
+            nextBackground();
+        })();
+
+        const playButton = document.querySelector('.play-button');
+        playButton.onclick = playMusic;
+        function playMusic() {
+            const autoplay = document.querySelector('audio').play();
+            if (autoplay != null) {
+                autoplay
+                    .then(() => (playButton.hidden = true))
+                    .catch(() => (playButton.hidden = false));
+            }
+        }
+        playMusic()
     </script>
 </html>

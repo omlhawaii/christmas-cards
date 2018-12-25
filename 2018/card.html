@@ -12,16 +12,21 @@
                 background-image: url('image(0).jpg');
                 /*animation: bkg 5s infinite;*/
             }
-            h2 {
+            .message {
                 position: absolute;
-                color: white;
-                font-family: 'Segoe Script', cursive;
-                text-shadow: 0 1px 2px #000000aa;
                 bottom: 2em;
                 left: 0;
                 width: 100%;
                 text-align: center;
+            }
+            h2 {
+                color: white;
+                font-family: 'Segoe Script', cursive;
+                text-shadow: 0 1px 2px #000000aa;
                 font-size: 5vh;
+            }
+            button {
+                font-size: 3vh;
             }
             canvas {
                 width: 100%;
@@ -103,12 +108,14 @@
         <link rel="preload" href="image(13).jpg" as="image" />
     </head>
     <body>
-        <audio><source src="mele_kalikimaka.mp3" type="audio/mpeg" /></audio>
-        <button class="play-button" hidden>▶ Play music</button>
-        <h2>
-            😊☃️ Mele Kalikimaka and Happy Holidays<br />
-            from Oakes Management 🎅🎄
-        </h2>
+        <div class="message">
+            <audio><source src="mele_kalikimaka.mp3" type="audio/mpeg" /></audio>
+            <button class="play-button" hidden>▶ Play music</button>
+            <h2>
+                😊☃️ Mele Kalikimaka and Happy Holidays<br />
+                from Oakes Management 🎅🎄
+            </h2>
+        </div>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"

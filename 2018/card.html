@@ -5,6 +5,11 @@
         <style>
             body {
                 margin: 0;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
+                animation: bkg 5s infinite;
+                height: 100vh;
             }
             h2 {
                 position: absolute;
@@ -15,12 +20,7 @@
                 left: 0;
                 width: 100%;
                 text-align: center;
-                font-size: 3em;
-            }
-            svg {
-                background-repeat: no-repeat;
-                background-size: cover;
-                animation: bkg 5s infinite;
+                font-size: 5vh;
             }
             canvas {
                 width: 100%;
@@ -87,6 +87,9 @@
         </style>
     </head>
     <body>
+        <audio autoplay="autoplay">
+            <source src="mele_kalikimaka.mp3" type="audio/mpeg">
+        </audio>
         <h2>
             😊☃️ Mele Kalikimaka and Happy Holidays<br />
             from Oakes Management 🎅🎄
@@ -99,7 +102,7 @@
             stroke-linejoin="round"
             stroke-miterlimit="1.5"
             clip-rule="evenodd"
-            viewBox="0 0 8000 4500"
+            viewBox="0 250 8000 1950"
         >
             <defs>
                 <g id="deer">

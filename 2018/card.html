@@ -96,7 +96,6 @@
         <link rel="preload" href="image(1).jpg" as="image" />
         <link rel="preload" href="image(2).jpg" as="image" />
         <link rel="preload" href="image(3).jpg" as="image" />
-        <link rel="preload" href="image(4).jpg" as="image" />
         <link rel="preload" href="image(5).jpg" as="image" />
         <link rel="preload" href="image(6).jpg" as="image" />
         <link rel="preload" href="image(7).jpg" as="image" />
@@ -493,7 +492,7 @@
                     document.body.style.backgroundImage =
                         backgrounds[(i = ++i % backgrounds.length)];
                 });
-                setTimeout(nextBackground, 1000);
+                setTimeout(nextBackground, 3000);
             }
             nextBackground();
         })();

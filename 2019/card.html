@@ -5,24 +5,176 @@
     <style>
       body {
         margin: 0;
-        background: black;
+        display: flex;
+        background: #f0f0f0;
         height: 100vh;
       }
       canvas {
         width: 100%;
         height: 100%;
-        display: block;
         position: absolute;
         top: 0;
-        z-index: -1;
+      }
+
+      .snowglobe {
+        position: relative;
+        font-size: 20px; /* Used for scalable sizing */
+        margin: auto;
+        width: 25em;
+        height: 29em;
+      }
+      .snowglobe__globe {
+        position: relative;
+        border-radius: 50%;
+        width: 25em;
+        height: 25em;
+        overflow: hidden;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+
+        background-repeat: no-repeat;
+        background-image: url('../2018/image(0).jpg');
+        background-size: cover;
+        background-position: center;
+      }
+      .snowglobe__shine {
+        position: absolute;
+        width: 14em;
+        top: 2em;
+        left: 3em;
+        opacity: 0.5;
+      }
+      .snowglobe__base {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 20em;
+        fill: #2e3c55;
+      }
+      .snowglobe__logo {
+        position: absolute;
+        display: block;
+        height: 4em;
+        width: 4em;
+        bottom: 0.75em;
+        left: 0;
+        right: 0;
+        margin: auto;
       }
     </style>
+    <link rel="preload" href="../2018/image(0).jpg" as="image" />
+    <link rel="preload" href="../2018/image(1).jpg" as="image" />
+    <link rel="preload" href="../2018/image(2).jpg" as="image" />
+    <link rel="preload" href="../2018/image(3).jpg" as="image" />
+    <link rel="preload" href="../2018/image(5).jpg" as="image" />
+    <link rel="preload" href="../2018/image(6).jpg" as="image" />
+    <link rel="preload" href="../2018/image(7).jpg" as="image" />
+    <link rel="preload" href="../2018/image(8).jpg" as="image" />
+    <link rel="preload" href="../2018/image(9).jpg" as="image" />
+    <link rel="preload" href="../2018/image(10).jpg" as="image" />
+    <link rel="preload" href="../2018/image(11).jpg" as="image" />
+    <link rel="preload" href="../2018/image(12).jpg" as="image" />
+    <link rel="preload" href="../2018/image(13).jpg" as="image" />
   </head>
   <body>
-
-    <canvas class="snow"></canvas>
+    <div class="snowglobe">
+      <div class="snowglobe__globe">
+        <canvas class="snow"></canvas>
+        <svg class="snowglobe__shine" viewBox="0 0 144 75">
+          <g transform="matrix(1,0,0,1,-369.125,-32.1623)">
+            <path d="M369.125,107.013C369.125,107.013 374.539,61.818 422.863,41.311C471.188,20.804 512.314,41.178 512.314,41.178C512.314,41.178 474.429,28.653 427.304,50.055C379.193,71.904 369.125,107.013 369.125,107.013Z" fill="white"/>
+          </g>
+        </svg>
+      </div>
+      <svg class="snowglobe__base" viewBox="0 0 301 100">
+        <g transform="matrix(1,0,0,1,-329.517,-288)">
+          <path d="M616.787,342.538C612.155,330.52 607.524,318.503 602.892,306.487C607.292,304.792 609.156,299.324 607.091,294.407C605.026,289.485 600.052,286.88 595.945,288.461C521.174,317.28 438.341,317.28 363.57,288.461C359.465,286.88 354.49,289.485 352.425,294.407C350.361,299.324 352.224,304.792 356.624,306.487C351.991,318.503 347.36,330.52 342.729,342.538C337.879,340.673 332.311,343.028 330.247,347.949C328.183,352.866 330.64,358.584 335.781,360.563C428.435,396.276 531.079,396.276 623.733,360.563C628.876,358.584 631.333,352.866 629.268,347.949C627.205,343.028 621.636,340.671 616.787,342.538Z"/>
+        </g>
+      </svg>
+      <img class="snowglobe__logo" alt="Oakes Management, LLC" src="logo.svg">
+    </div>
   </body>
   <script>
+    class Shake {
+      constructor(listener, options) {
+        //feature detect
+        this.hasDeviceMotion = 'ondevicemotion' in window;
+
+        this.listener = listener;
+        this.options = {
+          threshold: 15, //default velocity threshold for shake to register
+          timeout: 1000, //default interval between events
+          ...options,
+        };
+
+        this.reset();
+      }
+
+      //reset timer values
+      reset() {
+        //use date to prevent multiple shakes firing
+        this.lastTime = new Date();
+
+        //accelerometer values
+        this.lastX = null;
+        this.lastY = null;
+        this.lastZ = null;
+      };
+
+      //start listening for devicemotion
+      start() {
+        this.reset();
+        if (this.hasDeviceMotion) {
+          window.addEventListener('devicemotion', this, false);
+        }
+      }
+
+      //stop listening for devicemotion
+      stop() {
+        if (this.hasDeviceMotion) {
+          window.removeEventListener('devicemotion', this, false);
+        }
+        this.reset();
+      }
+
+      //calculates if shake did occur
+      devicemotion(e) {
+        var current = e.accelerationIncludingGravity;
+        var currentTime;
+        var timeDifference;
+        var deltaX = 0;
+        var deltaY = 0;
+        var deltaZ = 0;
+
+        if ((this.lastX === null) && (this.lastY === null) && (this.lastZ === null)) {
+          this.lastX = current.x;
+          this.lastY = current.y;
+          this.lastZ = current.z;
+          return;
+        }
+
+        deltaX = Math.abs(this.lastX - current.x);
+        deltaY = Math.abs(this.lastY - current.y);
+        deltaZ = Math.abs(this.lastZ - current.z);
+
+        if (((deltaX > this.options.threshold) && (deltaY > this.options.threshold)) || ((deltaX > this.options.threshold) && (deltaZ > this.options.threshold)) || ((deltaY > this.options.threshold) && (deltaZ > this.options.threshold))) {
+          //calculate time in milliseconds since last shake registered
+          currentTime = new Date();
+          timeDifference = currentTime.getTime() - this.lastTime.getTime();
+
+          if (timeDifference > this.options.timeout) {
+            this.listener();
+            this.lastTime = new Date();
+          }
+        }
+
+        this.lastX = current.x;
+        this.lastY = current.y;
+        this.lastZ = current.z;
+      }
+    }
+
     class Snowflake {
       constructor(canvas) {
         this.canvas = canvas;
@@ -84,6 +236,9 @@
         requestAnimationFrame(this.update);
 
         this.createSnowflakes();
+
+        const shake = new Shake(() => this.createSnowflakes());
+        shake.start();
       }
 
       onResize(width, height) {
@@ -123,5 +278,22 @@
         requestAnimationFrame(this.update);
       }
     }();
+
+    (function switchBackground() {
+      const backgrounds = Array.from(
+        document.querySelectorAll('link[rel="preload"]'),
+        link => `url('${link.getAttribute('href')}')`
+      );
+      const globe = document.querySelector('.snowglobe__globe');
+
+      let i = 0;
+      function nextBackground() {
+        requestAnimationFrame(() => {
+          globe.style.backgroundImage = backgrounds[(i = ++i % backgrounds.length)];
+        });
+        setTimeout(nextBackground, 3000);
+      }
+      nextBackground();
+    })();
   </script>
 </html>

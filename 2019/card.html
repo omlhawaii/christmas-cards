@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <style>
+            body {
+                margin: 0;
+                background: black;
+                height: 100vh;
+            }
+            canvas {
+                width: 100%;
+                height: 100%;
+                display: block;
+                position: absolute;
+                top: 0;
+                z-index: -1;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas class="snow"></canvas>
+    </body>
+    <script>
+        class Snowflake {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.x = 0;
+                this.y = 0;
+                this.vx = 0;
+                this.vy = 0;
+                this.radius = 0;
+                this.alpha = 0;
+                this.reset();
+            }
+
+            reset() {
+                this.x = Snowflake.randBetween(0, this.canvas.width);
+                this.y = Snowflake.randBetween(0, -this.canvas.height);
+                this.vx = Snowflake.randBetween(-3, 3);
+                this.vy = Snowflake.randBetween(2, 5);
+                this.radius = Snowflake.randBetween(1, 5);
+                this.alpha = Snowflake.randBetween(0.1, 0.9);
+            }
+
+            static randBetween(min, max) {
+                return min + Math.random() * (max - min);
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.y + this.radius > this.canvas.height) {
+                    this.reset();
+                }
+            }
+        }
+
+        new class Snow {
+            constructor() {
+                /** @type {HTMLCanvasElement} */
+                this.canvas = document.querySelector('canvas.snow');
+                this.ctx = this.canvas.getContext('2d');
+
+                if ('ResizeObserver' in window) {
+                  const observer = new ResizeObserver(entries => {
+                    for (const entry of entries) {
+                      if (entry.contentBoxSize) {
+                        this.onResize(entry.contentBoxSize.inlineSize, entry.contentBoxSize.blockSize);
+                      } else {
+                        this.onResize(entry.contentRect.width, entry.contentRect.height);
+                      }
+                    }
+                  });
+                  observer.observe(this.canvas);
+                  this.onResize(this.canvas.clientWidth, this.canvas.clientHeight);
+                } else {
+                  window.addEventListener('resize', () => this.onResize(this.canvas.clientWidth, this.canvas.clientHeight));
+                  this.onResize(this.canvas.clientWidth, this.canvas.clientHeight);
+                }
+                this.update = this.update.bind(this);
+                requestAnimationFrame(this.update);
+
+                this.createSnowflakes();
+            }
+
+            onResize(width, height) {
+                this.canvas.width = width;
+                this.canvas.height = height;
+            }
+
+            createSnowflakes() {
+                const flakes = parseInt(this.canvas.width / 4, 10);
+                this.snowflakes = new Array(flakes)
+                    .fill(null)
+                    .map(() => new Snowflake(this.canvas));
+            }
+
+            update() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.snowflakes.forEach(flake => {
+                    flake.update();
+
+                    this.ctx.save();
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        flake.x,
+                        flake.y,
+                        flake.radius,
+                        0,
+                        Math.PI * 2
+                    );
+                    this.ctx.closePath();
+                    this.ctx.globalAlpha = flake.a;
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+
+                requestAnimationFrame(this.update);
+            }
+        }();
+    </script>
+</html>

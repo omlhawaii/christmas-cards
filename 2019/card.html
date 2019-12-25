@@ -16,6 +16,23 @@
         top: 0;
       }
 
+      .message {
+        position: absolute;
+        bottom: 2em;
+        left: 0;
+        width: 100%;
+        text-align: center;
+      }
+      h2 {
+        color: white;
+        font-family: 'Segoe Script', cursive;
+        text-shadow: 0 1px 2px #000000aa;
+        font-size: 5vh;
+      }
+      button {
+        font-size: 3vh;
+      }
+
       .snowglobe {
         position: relative;
         font-size: 20px; /* Used for scalable sizing */
@@ -99,6 +116,10 @@
         </g>
       </svg>
       <img class="snowglobe__logo" alt="Oakes Management, LLC" src="logo.svg">
+    </div>
+    <div class="message">
+      <audio><source src="let_it_snow.mp3" type="audio/mpeg" /></audio>
+      <button class="play-button" hidden>▶ Play music</button>
     </div>
   </body>
   <script>
@@ -233,5 +254,19 @@
       }
       nextBackground();
     })();
+
+    {
+      const playButton = document.querySelector('.play-button');
+      playButton.onclick = playMusic;
+      function playMusic() {
+          const autoplay = document.querySelector('audio').play();
+          if (autoplay != null) {
+              autoplay
+                  .then(() => (playButton.hidden = true))
+                  .catch(() => (playButton.hidden = false));
+          }
+      }
+      playMusic()
+    }
   </script>
 </html>

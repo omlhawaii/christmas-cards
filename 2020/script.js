@@ -16,7 +16,7 @@ let worker;
 let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
 
-const numPoints = 200;
+const numPoints = 10000;
 
 init();
 animate();

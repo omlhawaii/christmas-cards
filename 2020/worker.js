@@ -103,15 +103,14 @@ function update(numPoints, initPoint, roomSize, delta) {
         if (
           point.position[X] < -roomSize[X] ||
           point.position[X] > roomSize[X] ||
-          point.position[Y] < -roomSize[Y] ||
-          point.position[Y] > roomSize[Y]
+          point.position[Y] < -roomSize[Y]
         ) {
           point.state = State.STOPPED;
         }
 
         // Gravity
         point.velocity[X] += point.velocity[X] > 0 ? -0.0005 : 0.0005;
-        point.velocity[Y] += 0.000098 * delta;
+        point.velocity[Y] += -0.000098 * delta;
         break;
       case State.STOPPED:
         initPoint(point, index);
@@ -128,23 +127,23 @@ self.addEventListener("message", (evt) => {
   const {
     roomSize,
     numPoints,
-    startPos = [0, 0, 0, 0],
+    startPos = [0, 0],
   } = evt.data;
   clearInterval(intervalId);
 
-  const [xMin, xMax, yMin, yMax] = startPos;
+  const [startX, startY] = startPos;
   /**
    * @param {Point} point
    * @param {number} index
    */
   function initPoint(point, index) {
-    point.position[X] = random(xMin, xMax);
-    point.position[Y] = random(yMin, yMax);
+    point.position[X] = random(startX - 0.1, startX + 0.1);
+    point.position[Y] = random(startY - 0.1, startY + 0.1);
     point.position[Z] = 0;
 
     const offset = Math.sin(index / 10) / 4;
     point.velocity[X] = random(-0.1, 0.1) + offset;
-    point.velocity[Y] = random(-0.1, -0.9);
+    point.velocity[Y] = random(0.1, 0.9);
     point.velocity[Z] = 0;
   }
 

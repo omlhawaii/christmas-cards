@@ -44,7 +44,7 @@ function easeInSine(x) {
 
 /**
  * @param {number} numPoints
- * @param {(point: Point) => void} initPoint
+ * @param {(point: Point, index: number) => void} initPoint
  */
 function init(numPoints, initPoint) {
   positions = new Float32Array(3 * numPoints);
@@ -62,7 +62,7 @@ function init(numPoints, initPoint) {
 
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
-    initPoint(point);
+    initPoint(point, i);
   }
 }
 
@@ -80,18 +80,18 @@ function easingCurve(curve, width, height, timePassed) {
 
 /**
  * @param {number} numPoints
- * @param {(point: Point) => void} initPoint
+ * @param {(point: Point, index: number) => void} initPoint
  * @param {[number, number]} roomSize
  * @param {number} delta
  */
 function update(numPoints, initPoint, roomSize, delta) {
   timePassed += delta;
-  const rate = easingCurve(easeInSine, 10000, 100, timePassed) + 1;
+  const rate = easingCurve(easeInSine, 10000, 100, timePassed) + 0.5;
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
+    const index = i + (point.recycleCount * numPoints);
     switch (point.state) {
       case State.NOT_STARTED:
-        const index = i + point.recycleCount * numPoints;
         if (timePassed > index * rate) {
           point.state = State.LAUNCHED;
         }
@@ -110,10 +110,11 @@ function update(numPoints, initPoint, roomSize, delta) {
         }
 
         // Gravity
+        point.velocity[X] += point.velocity[X] > 0 ? -0.0005 : 0.0005;
         point.velocity[Y] += 0.000098 * delta;
         break;
       case State.STOPPED:
-        initPoint(point);
+        initPoint(point, index);
         point.recycleCount++;
         point.state = State.NOT_STARTED;
         break;
@@ -128,22 +129,22 @@ self.addEventListener("message", (evt) => {
     roomSize,
     numPoints,
     startPos = [0, 0, 0, 0],
-    startVel = [0.1, 0.2, -0.1, -0.2],
   } = evt.data;
   clearInterval(intervalId);
 
   const [xMin, xMax, yMin, yMax] = startPos;
-  const [xSpeedMin, xSpeedMax, ySpeedMin, ySpeedMax] = startVel;
   /**
    * @param {Point} point
+   * @param {number} index
    */
-  function initPoint(point) {
+  function initPoint(point, index) {
     point.position[X] = random(xMin, xMax);
     point.position[Y] = random(yMin, yMax);
     point.position[Z] = 0;
 
-    point.velocity[X] = random(xSpeedMin, xSpeedMax);
-    point.velocity[Y] = random(ySpeedMin, ySpeedMax);
+    const offset = Math.sin(index / 10) / 4;
+    point.velocity[X] = random(-0.1, 0.1) + offset;
+    point.velocity[Y] = random(-0.1, -0.9);
     point.velocity[Z] = 0;
   }
 

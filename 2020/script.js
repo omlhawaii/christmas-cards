@@ -54,6 +54,17 @@ function init() {
   const houseWarmTexture = textureLoader.load("img/housea-warm.jpg");
   const houseColdTexture = textureLoader.load("img/housea-cold.jpg");
 
+  const elf0 = textureLoader.load("img/screwy0.png");
+  const elf1 = textureLoader.load("img/screwy1.png");
+  const elf2 = textureLoader.load("img/screwy2.png");
+  const elfMaterial = new THREE.SpriteMaterial({
+    map: elf0,
+  });
+  const elf = new THREE.Sprite(elfMaterial);
+  elf.position.set(0, -150, 0);
+  elf.scale.set(85, 100, 1);
+  scene.add(elf);
+
   const houseMaterial = new THREE.SpriteMaterial({
     map: houseWarmTexture,
   });
@@ -76,6 +87,7 @@ function init() {
     positions.needsUpdate = true;
     coverMaterial.opacity = evt.data.coverOpacity;
     houseMaterial.map = phase === 2 ? houseColdTexture : houseWarmTexture;
+    elfMaterial.map = phase === 0 ? elf0 : phase === 1 ? elf1 : elf2;
   });
 
   material = new THREE.PointsMaterial({
@@ -96,7 +108,7 @@ function init() {
     map: textureLoader.load("img/snow-machine.png"),
   });
   snowMachine = new THREE.Sprite(machineMaterial);
-  snowMachine.position.set(50, -150, 0);
+  snowMachine.position.set(55, -150, 0);
   snowMachine.scale.set(100, 100, 1);
   scene.add(snowMachine);
 

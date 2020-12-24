@@ -51,10 +51,13 @@ function init() {
 
   const sprite = textureLoader.load(`Snow_flake.png`);
 
-  const houseSunMaterial = new THREE.SpriteMaterial({
-    map: textureLoader.load("img/housea-sun.jpg"),
+  const houseWarmTexture = textureLoader.load("img/housea-warm.jpg");
+  const houseColdTexture = textureLoader.load("img/housea-cold.jpg");
+
+  const houseMaterial = new THREE.SpriteMaterial({
+    map: houseWarmTexture,
   });
-  background = new THREE.Sprite(houseSunMaterial);
+  background = new THREE.Sprite(houseMaterial);
   background.position.z = -3;
   background.scale.set(frustumSize * aspect, frustumSize, 1);
   scene.add(background);
@@ -66,9 +69,13 @@ function init() {
   worker.addEventListener("message", (evt) => {
     /** @type {Float32Array} */
     const newPositions = evt.data.positions;
+    /** @type {0 | 1 | 2} */
+    const phase = evt.data.phase;
+
     positions.array.set(newPositions);
     positions.needsUpdate = true;
     coverMaterial.opacity = evt.data.coverOpacity;
+    houseMaterial.map = phase === 2 ? houseColdTexture : houseWarmTexture;
   });
 
   material = new THREE.PointsMaterial({

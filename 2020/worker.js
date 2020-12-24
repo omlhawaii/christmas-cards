@@ -26,7 +26,7 @@ let lastFrame;
 let timePassed;
 /** @type {number} */
 let coverOpacity;
-/** @type {0 | 1} */
+/** @type {0 | 1 | 2} */
 let phase;
 
 /**
@@ -136,16 +136,16 @@ function doubleEasing(curve1, curve2, width, height, n) {
  * @param {number} delta
  */
 function update(numPoints, initPoint, roomSize, delta) {
-  let phaseSwitch = false;
   timePassed += delta;
 
   let rate;
-  if (phase === 0) {
+  if (phase < 2) {
     rate = easingCurveInvert(easeInSine, 10000, 100, timePassed) + 0.5;
     coverOpacity = easingCurve(easeOutCubic, 2500, 1, timePassed - 10000);
-    if (coverOpacity >= 1) {
-      phase = 1;
-      phaseSwitch = true;
+    if (phase < 1 && rate < 50) {
+      phase = 1
+    } else if (coverOpacity >= 1) {
+      phase = 2;
     }
   } else {
     coverOpacity = easingCurveInvert(easeInSine, 2500, 1, timePassed - 12500);
@@ -183,8 +183,6 @@ function update(numPoints, initPoint, roomSize, delta) {
         break;
     }
   }
-
-  return phaseSwitch;
 }
 
 let intervalId;
@@ -222,9 +220,9 @@ self.addEventListener("message", (evt) => {
     const delta = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    const phaseSwitch = update(numPoints, initPoint, boundary, delta);
+    update(numPoints, initPoint, boundary, delta);
 
     // @ts-ignore
-    self.postMessage({ positions, coverOpacity, phaseSwitch });
+    self.postMessage({ positions, coverOpacity, phase });
   }, 1000 / 60);
 });

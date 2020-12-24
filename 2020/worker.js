@@ -13,6 +13,7 @@ const State = {
  * @prop {Float32Array} position
  * @prop {Float32Array} velocity
  * @prop {State[keyof State]} state
+ * @prop {number} recycleCount
  */
 
 /** @type {Float32Array} */
@@ -43,10 +44,9 @@ function easeInSine(x) {
 
 /**
  * @param {number} numPoints
- * @param {[number, number, number, number]} startPos
- * @param {[number, number, number, number]} startVel
+ * @param {(point: Point) => void} initPoint
  */
-function init(numPoints, startPos, startVel) {
+function init(numPoints, initPoint) {
   positions = new Float32Array(3 * numPoints);
   const velocities = new Float32Array(3 * numPoints);
   points = Array.from({ length: numPoints }, (_, i) => ({
@@ -55,22 +55,14 @@ function init(numPoints, startPos, startVel) {
     position: positions.subarray(i * 3 + 0, i * 3 + 3),
     velocity: velocities.subarray(i * 3 + 0, i * 3 + 3),
     state: State.NOT_STARTED,
+    recycleCount: 0,
   }));
   lastFrame = performance.now();
-  timePassed = 0
+  timePassed = 0;
 
-  const [xMin, xMax, yMin, yMax] = startPos;
-  const [xSpeedMin, xSpeedMax, ySpeedMin, ySpeedMax] = startVel;
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
-
-    point.position[X] = random(xMin, xMax);
-    point.position[Y] = random(yMin, yMax);
-    point.position[Z] = 0;
-
-    point.velocity[X] = random(xSpeedMin, xSpeedMax);
-    point.velocity[Y] = random(ySpeedMin, ySpeedMax);
-    point.velocity[Z] = 0;
+    initPoint(point);
   }
 }
 
@@ -88,17 +80,19 @@ function easingCurve(curve, width, height, timePassed) {
 
 /**
  * @param {number} numPoints
+ * @param {(point: Point) => void} initPoint
  * @param {[number, number]} roomSize
  * @param {number} delta
  */
-function update(numPoints, roomSize, delta) {
+function update(numPoints, initPoint, roomSize, delta) {
   timePassed += delta;
-  const rate = easingCurve(easeInSine, 10000, 50, timePassed) + 50;
+  const rate = easingCurve(easeInSine, 10000, 100, timePassed) + 1;
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
     switch (point.state) {
       case State.NOT_STARTED:
-        if (timePassed > (i * rate)) {
+        const index = i + point.recycleCount * numPoints;
+        if (timePassed > index * rate) {
           point.state = State.LAUNCHED;
         }
         break;
@@ -117,7 +111,11 @@ function update(numPoints, roomSize, delta) {
 
         // Gravity
         point.velocity[Y] += 0.000098 * delta;
+        break;
       case State.STOPPED:
+        initPoint(point);
+        point.recycleCount++;
+        point.state = State.NOT_STARTED;
         break;
     }
   }
@@ -133,7 +131,23 @@ self.addEventListener("message", (evt) => {
     startVel = [0.1, 0.2, -0.1, -0.2],
   } = evt.data;
   clearInterval(intervalId);
-  init(numPoints, startPos, startVel);
+
+  const [xMin, xMax, yMin, yMax] = startPos;
+  const [xSpeedMin, xSpeedMax, ySpeedMin, ySpeedMax] = startVel;
+  /**
+   * @param {Point} point
+   */
+  function initPoint(point) {
+    point.position[X] = random(xMin, xMax);
+    point.position[Y] = random(yMin, yMax);
+    point.position[Z] = 0;
+
+    point.velocity[X] = random(xSpeedMin, xSpeedMax);
+    point.velocity[Y] = random(ySpeedMin, ySpeedMax);
+    point.velocity[Z] = 0;
+  }
+
+  init(numPoints, initPoint);
 
   /** @type {[number, number]} */
   const boundary = [roomSize[X] + 1, roomSize[Y] + 1];
@@ -142,7 +156,7 @@ self.addEventListener("message", (evt) => {
     const delta = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    update(numPoints, boundary, delta);
+    update(numPoints, initPoint, boundary, delta);
 
     // @ts-ignore
     self.postMessage(positions);

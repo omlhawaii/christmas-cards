@@ -158,6 +158,8 @@ function onWindowResize() {
   camera.bottom = frustumSize / -2;
   camera.updateProjectionMatrix();
 
+  background.scale.set(frustumSize * aspect, frustumSize, 1);
+
   const coverGeometry = new THREE.PlaneGeometry(
     frustumSize * aspect,
     frustumSize

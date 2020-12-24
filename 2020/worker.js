@@ -24,6 +24,10 @@ let points;
 let lastFrame;
 /** @type {number} */
 let timePassed;
+/** @type {number} */
+let coverOpacity;
+/** @type {0 | 1} */
+let phase;
 
 /**
  * Return a random number between a and b.
@@ -35,11 +39,28 @@ function random(a, b) {
 }
 
 /**
+ * @param {number} n
+ * @param {number} min
+ * @param {number} max
+ */
+function clamp(n, min, max) {
+  return Math.min(Math.max(n, min), max);
+};
+
+/**
  * @param {number} x
  * @returns {number} [0-1]
  */
 function easeInSine(x) {
   return 1 - Math.cos((x * Math.PI) / 2);
+}
+
+/**
+ * @param {number} x
+ * @returns {number} [0-1]
+ */
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3);
 }
 
 /**
@@ -59,6 +80,8 @@ function init(numPoints, initPoint) {
   }));
   lastFrame = performance.now();
   timePassed = 0;
+  coverOpacity = 0;
+  phase = 0;
 
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
@@ -70,12 +93,40 @@ function init(numPoints, initPoint) {
  * @param {(n: number) => number} curve
  * @param {number} width
  * @param {number} height
- * @param {number} timePassed
+ * @param {number} n
  */
-function easingCurve(curve, width, height, timePassed) {
-  const x = Math.min(timePassed / width, 1);
-  const invert = 1 - curve(x);
+function easingCurve(curve, width, height, n) {
+  const x = clamp(n / width, 0, 1);
+  return curve(x) * height;
+}
+
+/**
+ * @param {(n: number) => number} curve
+ * @param {number} width
+ * @param {number} height
+ * @param {number} n
+ */
+function easingCurveInvert(curve, width, height, n) {
+  const invert = 1 - easingCurve(curve, width, 1, n);
   return invert * height;
+}
+
+/**
+ * @param {(n: number) => number} curve1
+ * @param {(n: number) => number} curve2
+ * @param {number} width
+ * @param {number} height
+ * @param {number} n
+ */
+function doubleEasing(curve1, curve2, width, height, n) {
+  const x = clamp(n / width, 0, 2);
+  if (x < 1) {
+    console.log('a', curve1(x) * height)
+    return curve1(x) * height;
+  } else {
+    const invert = 1 - curve2(x - 1);
+    return invert * height;
+  }
 }
 
 /**
@@ -85,8 +136,21 @@ function easingCurve(curve, width, height, timePassed) {
  * @param {number} delta
  */
 function update(numPoints, initPoint, roomSize, delta) {
+  let phaseSwitch = false;
   timePassed += delta;
-  const rate = easingCurve(easeInSine, 10000, 100, timePassed) + 0.5;
+
+  let rate;
+  if (phase === 0) {
+    rate = easingCurveInvert(easeInSine, 10000, 100, timePassed) + 0.5;
+    coverOpacity = easingCurve(easeOutCubic, 2500, 1, timePassed - 10000);
+    if (coverOpacity >= 1) {
+      phase = 1;
+      phaseSwitch = true;
+    }
+  } else {
+    coverOpacity = easingCurveInvert(easeInSine, 2500, 1, timePassed - 12500);
+  }
+
   for (var i = 0; i < numPoints; i++) {
     const point = points[i];
     const index = i + (point.recycleCount * numPoints);
@@ -119,6 +183,8 @@ function update(numPoints, initPoint, roomSize, delta) {
         break;
     }
   }
+
+  return phaseSwitch;
 }
 
 let intervalId;
@@ -156,9 +222,9 @@ self.addEventListener("message", (evt) => {
     const delta = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    update(numPoints, initPoint, boundary, delta);
+    const phaseSwitch = update(numPoints, initPoint, boundary, delta);
 
     // @ts-ignore
-    self.postMessage(positions);
+    self.postMessage({ positions, coverOpacity, phaseSwitch });
   }, 1000 / 60);
 });

@@ -15,6 +15,12 @@ let positions;
 let worker;
 /** @type {THREE.Sprite} */
 let snowMachine;
+/** @type {THREE.Sprite} */
+let background;
+/** @type {THREE.Mesh} */
+let cover;
+/** @type {THREE.MeshBasicMaterial} */
+let coverMaterial;
 
 const frustumSize = 500;
 let aspect = window.innerWidth / window.innerHeight;
@@ -45,15 +51,24 @@ function init() {
 
   const sprite = textureLoader.load(`Snow_flake.png`);
 
+  const houseSunMaterial = new THREE.SpriteMaterial({
+    map: textureLoader.load("img/housea-sun.jpg"),
+  });
+  background = new THREE.Sprite(houseSunMaterial);
+  background.position.z = -3;
+  background.scale.set(frustumSize * aspect, frustumSize, 1);
+  scene.add(background);
+
   positions = new THREE.Float32BufferAttribute(vertices, 3);
   geometry.setAttribute("position", positions);
 
   worker = new Worker("worker.js");
   worker.addEventListener("message", (evt) => {
     /** @type {Float32Array} */
-    const newPositions = evt.data;
+    const newPositions = evt.data.positions;
     positions.array.set(newPositions);
     positions.needsUpdate = true;
+    coverMaterial.opacity = evt.data.coverOpacity;
   });
 
   material = new THREE.PointsMaterial({
@@ -74,8 +89,25 @@ function init() {
     map: textureLoader.load("img/snow-machine.png"),
   });
   snowMachine = new THREE.Sprite(machineMaterial);
+  snowMachine.position.set(50, -150, 0);
   snowMachine.scale.set(100, 100, 1);
   scene.add(snowMachine);
+
+  //
+
+  const coverGeometry = new THREE.PlaneGeometry(
+    frustumSize * aspect,
+    frustumSize
+  );
+  coverMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.FrontSide,
+    transparent: true,
+    opacity: 0,
+  });
+  cover = new THREE.Mesh(coverGeometry, coverMaterial);
+  cover.position.z = 1;
+  scene.add(cover);
 
   //
 
@@ -106,6 +138,12 @@ function onWindowResize() {
   camera.top = frustumSize / 2;
   camera.bottom = frustumSize / -2;
   camera.updateProjectionMatrix();
+
+  const coverGeometry = new THREE.PlaneGeometry(
+    frustumSize * aspect,
+    frustumSize
+  );
+  cover.geometry = coverGeometry;
 
   initWorker();
   renderer.setSize(window.innerWidth, window.innerHeight);

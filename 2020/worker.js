@@ -172,9 +172,10 @@ function update(numPoints, initPoint, roomSize, delta) {
           point.state = State.STOPPED;
         }
 
-        // Gravity
+        // Gravity & drag
         point.velocity[X] += point.velocity[X] > 0 ? -0.0005 : 0.0005;
         point.velocity[Y] += -0.000098 * delta;
+        point.velocity[Y] = Math.max(point.velocity[Y], -0.5);
         break;
       case State.STOPPED:
         initPoint(point, index);

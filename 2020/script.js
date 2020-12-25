@@ -27,6 +27,16 @@ let aspect = window.innerWidth / window.innerHeight;
 
 const numPoints = 10000;
 
+const backgrounds = {
+  apple: { img: "housea", pos: [55, -150], scale: 1 },
+  banana: { img: "houseb", pos: [120, 55], scale: 0.5 },
+  carrot: { img: "housec", pos: [-50, -200], scale: 1 },
+  durian: { img: "housed", pos: [120, -190], scale: 1 },
+  edamame: { img: "housee", pos: [200, -95], scale: 0.6 },
+};
+const searchParams = new URLSearchParams(window.location.search);
+const bkg = backgrounds[searchParams.get("id")] || backgrounds.apple;
+
 init();
 animate();
 
@@ -51,8 +61,8 @@ function init() {
 
   const sprite = textureLoader.load(`Snow_flake.png`);
 
-  const houseWarmTexture = textureLoader.load("img/housea-warm.jpg");
-  const houseColdTexture = textureLoader.load("img/housea-cold.jpg");
+  const houseWarmTexture = textureLoader.load(`img/${bkg.img}-warm.jpg`);
+  const houseColdTexture = textureLoader.load(`img/${bkg.img}-cold.jpg`);
 
   const elf0 = textureLoader.load("img/screwy0.png");
   const elf1 = textureLoader.load("img/screwy1.png");
@@ -61,8 +71,8 @@ function init() {
     map: elf0,
   });
   const elf = new THREE.Sprite(elfMaterial);
-  elf.position.set(0, -150, 0);
-  elf.scale.set(85, 100, 1);
+  elf.position.set(bkg.pos[0] - (55 * bkg.scale), bkg.pos[1] + 10, 0);
+  elf.scale.set(85 * bkg.scale, 100 * bkg.scale, 1);
   scene.add(elf);
 
   const houseMaterial = new THREE.SpriteMaterial({
@@ -108,8 +118,8 @@ function init() {
     map: textureLoader.load("img/snow-machine.png"),
   });
   snowMachine = new THREE.Sprite(machineMaterial);
-  snowMachine.position.set(55, -150, 0);
-  snowMachine.scale.set(100, 100, 1);
+  snowMachine.position.set(bkg.pos[0], bkg.pos[1], 0);
+  snowMachine.scale.set(100 * bkg.scale, 100 * bkg.scale, 1);
   scene.add(snowMachine);
 
   //
@@ -145,7 +155,7 @@ function initWorker() {
   worker.postMessage({
     roomSize: [(frustumSize * aspect) / 2, frustumSize / 2],
     numPoints,
-    startPos: [snowMachine.position.x, snowMachine.position.y + 40],
+    startPos: [snowMachine.position.x, snowMachine.position.y + (40 * bkg.scale)],
   });
 }
 

@@ -32,7 +32,7 @@ const backgrounds = {
   banana: { img: "houseb", pos: [120, 55], scale: 0.5 },
   carrot: { img: "housec", pos: [-50, -200], scale: 1 },
   durian: { img: "housed", pos: [120, -190], scale: 1 },
-  edamame: { img: "housee", pos: [200, -95], scale: 0.6 },
+  edamame: { img: "housee", pos: [80, -95], scale: 0.6 },
 };
 const searchParams = new URLSearchParams(window.location.search);
 const bkg = backgrounds[searchParams.get("id")] || backgrounds.apple;

@@ -32,7 +32,7 @@ animate();
  * @param {THREE.Vector3} [data.position] Position of the ornament
  */
 function ornament(data) {
-  const { front, back, radius = 100, color = 0x2e3c55 } = data;
+  const { front, back, radius = 100, color = 0xdcb869 } = data;
 
   const loader = new THREE.TextureLoader();
   /** @type {THREE.Material[]} */
@@ -90,7 +90,7 @@ function init() {
   camera.position.z = 1800;
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
+  scene.background = new THREE.Color(0x2e3c55);
 
   const light = new THREE.DirectionalLight(0xffffff);
   light.position.set(0, 0, 1);
@@ -98,85 +98,18 @@ function init() {
 
   // shadow
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 128;
-
-  const context = canvas.getContext("2d");
-  const gradient = context.createRadialGradient(
-    canvas.width / 2,
-    canvas.height / 2,
-    0,
-    canvas.width / 2,
-    canvas.height / 2,
-    canvas.width / 2
-  );
-  gradient.addColorStop(0.1, "rgba(210,210,210,1)");
-  gradient.addColorStop(1, "rgba(255,255,255,1)");
-
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  const shadowTexture = new THREE.CanvasTexture(canvas);
-
-  const shadowMaterial = new THREE.MeshBasicMaterial({ map: shadowTexture });
-  const shadowGeo = new THREE.PlaneGeometry(300, 300, 10, 1);
-
-  let shadowMesh;
-
-  shadowMesh = new THREE.Mesh(shadowGeo, shadowMaterial);
-  shadowMesh.position.y = -250;
-  shadowMesh.rotation.x = -Math.PI / 2;
-  //scene.add(shadowMesh);
-
-  shadowMesh = new THREE.Mesh(shadowGeo, shadowMaterial);
-  shadowMesh.position.y = -250;
-  shadowMesh.position.x = -400;
-  shadowMesh.rotation.x = -Math.PI / 2;
-  //scene.add(shadowMesh);
-
-  shadowMesh = new THREE.Mesh(shadowGeo, shadowMaterial);
-  shadowMesh.position.y = -250;
-  shadowMesh.position.x = 400;
-  shadowMesh.rotation.x = -Math.PI / 2;
-  //scene.add(shadowMesh);
-
-  const radius = 200;
-
-  const geometry1 = new THREE.IcosahedronGeometry(radius, 1);
-
-  const count = geometry1.attributes.position.count;
-  geometry1.setAttribute(
-    "color",
-    new THREE.BufferAttribute(new Float32Array(count * 3), 3)
-  );
-
-  const geometry2 = geometry1.clone();
-  const geometry3 = geometry1.clone();
-
-  const color = new THREE.Color();
-  const positions1 = geometry1.attributes.position;
-  const positions2 = geometry2.attributes.position;
-  const positions3 = geometry3.attributes.position;
-  const colors1 = geometry1.attributes.color;
-  const colors2 = geometry2.attributes.color;
-  const colors3 = geometry3.attributes.color;
-
-  for (let i = 0; i < count; i++) {
-    color.setHSL((positions1.getY(i) / radius + 1) / 2, 1.0, 0.5);
-    colors1.setXYZ(i, color.r, color.g, color.b);
-
-    color.setHSL(0, (positions2.getY(i) / radius + 1) / 2, 0.5);
-    colors2.setXYZ(i, color.r, color.g, color.b);
-
-    color.setRGB(1, 0.8 - (positions3.getY(i) / radius + 1) / 2, 0);
-    colors3.setXYZ(i, color.r, color.g, color.b);
-  }
-
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
+
+  /*const loader = new THREE.TextureLoader();
+  const planeGeometry = new THREE.PlaneGeometry(3000, 3000);
+  const plane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial({
+    map: loader.load('./img/tree.jpg')
+  }))
+  plane.position.z = -200;
+  scene.add(plane);*/
 
   ornament({
     front: "./img/image.png",
@@ -189,6 +122,7 @@ function init() {
     back: "./img/image(3).png",
     position: new THREE.Vector3(250, 10, 0),
     rotate: 0.06,
+    color: 0xdcb869,
   });
   ornament({
     front: "./img/image(4).png",

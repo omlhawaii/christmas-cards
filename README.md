@@ -8,3 +8,4 @@ Animations that we've sent out as Christmas cards to coworkers and clients.
 - [2018](./2018)
 - [2019](./2019)
 - [2020](./2020)
+- [2021](./2021)

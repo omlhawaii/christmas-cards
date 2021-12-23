@@ -18,6 +18,8 @@ let mouseX = 0,
 let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
 
+const portraitMedia = window.matchMedia("(orientation: portrait)");
+
 init();
 animate();
 
@@ -29,10 +31,17 @@ animate();
  * @param {number} [data.rotate] Rate of rotation
  * @param {number} [data.color] Color to use on ornament ring and sides
  * @param {number} [data.radius] Radius of the ornament.
- * @param {THREE.Vector3} [data.position] Position of the ornament
+ * @param {THREE.Vector3} data.position Position of the ornament
+ * @param {THREE.Vector3} [data.portrait] Position of the ornament in portrait view
  */
 function ornament(data) {
-  const { front, back, radius = 100, color = 0xdcb869 } = data;
+  const {
+    front,
+    back,
+    radius = 100,
+    color = 0xdcb869,
+    position = new THREE.Vector3(),
+  } = data;
 
   const loader = new THREE.TextureLoader();
   /** @type {THREE.Material[]} */
@@ -56,7 +65,13 @@ function ornament(data) {
   const mesh = new THREE.Mesh(geometry, materials);
   mesh.rotation.x = -Math.PI / 2;
 
-  const ringGeometry = new THREE.RingGeometry(5, 10, 8);
+  const innerRingRadius = 5;
+  const outerRingRadius = 10;
+  const ringGeometry = new THREE.RingGeometry(
+    innerRingRadius,
+    outerRingRadius,
+    8
+  );
   const ringMesh = new THREE.Mesh(
     ringGeometry,
     new THREE.MeshStandardMaterial({
@@ -66,13 +81,21 @@ function ornament(data) {
   );
   ringMesh.position.y = radius;
 
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3().setY(radius + innerRingRadius),
+    new THREE.Vector3().setY(1000),
+  ]);
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color,
+  });
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+
   const group = new THREE.Group();
   group.add(mesh);
+  group.add(line);
   group.add(ringMesh);
 
-  if (data.position) {
-    group.position.copy(data.position);
-  }
+  group.position.copy(position);
 
   scene.add(group);
   ornaments.set(group, data);
@@ -103,31 +126,56 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
-  /*const loader = new THREE.TextureLoader();
-  const planeGeometry = new THREE.PlaneGeometry(3000, 3000);
-  const plane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial({
-    map: loader.load('./img/tree.jpg')
-  }))
-  plane.position.z = -200;
-  scene.add(plane);*/
+  const loader = new THREE.CubeTextureLoader();
+  const skyboxTexture = loader.load([
+    'creek_skybox/posx.jpg',
+    'creek_skybox/negx.jpg',
+    'creek_skybox/posy.jpg',
+    'creek_skybox/negy.jpg',
+    'creek_skybox/posz.jpg',
+    'creek_skybox/negz.jpg',
+  ]);
+  scene.background = skyboxTexture;
 
   ornament({
     front: "./img/image.png",
     back: "./img/image(1).png",
     radius: 70,
     rotate: 0.1,
+    position: new THREE.Vector3(0, -50, 100),
   });
   ornament({
     front: "./img/image(2).png",
     back: "./img/image(3).png",
     position: new THREE.Vector3(250, 10, 0),
+    portrait: new THREE.Vector3(150, 300, 0),
     rotate: 0.06,
-    color: 0xdcb869,
   });
   ornament({
     front: "./img/image(4).png",
-    back: "./img/image(5).png",
-    position: new THREE.Vector3(-250, 20, 0)
+    back: "./img/image(6).png",
+    position: new THREE.Vector3(-250, 150, 10),
+    rotate: 0.04,
+  });
+  ornament({
+    front: "./img/image(5).png",
+    back: "./img/image(7).png",
+    position: new THREE.Vector3(110, -200, -100),
+  });
+  ornament({
+    front: "./img/image(8).png",
+    back: "./img/image(9).png",
+    position: new THREE.Vector3(-170, -100, -100),
+    radius: 70,
+    rotate: 0.07
+  });
+  ornament({
+    front: "./img/elfa_1.png",
+    back: "./img/elfa_b.png",
+    position: new THREE.Vector3(-350, -200, -10),
+    portrait: new THREE.Vector3(-200, -400, -10),
+    rotate: 0.3,
+    radius: 60,
   });
 
   document.addEventListener("mousemove", onDocumentMouseMove);
@@ -135,6 +183,9 @@ function init() {
   //
 
   window.addEventListener("resize", onWindowResize);
+
+  onOrientationChange(portraitMedia);
+  portraitMedia.addEventListener("change", onOrientationChange);
 }
 
 function onWindowResize() {
@@ -150,6 +201,16 @@ function onWindowResize() {
 function onDocumentMouseMove(event) {
   mouseX = event.clientX - windowHalfX;
   mouseY = event.clientY - windowHalfY;
+}
+
+/**
+ * @param {{matches:boolean}} event
+ */
+function onOrientationChange({ matches: isPortrait }) {
+  for (const [ornament, { position, portrait = position }] of ornaments) {
+    ornament.position.copy(isPortrait ? portrait : position);
+  }
+  camera.position.z = isPortrait ? 4000 : 1800;
 }
 
 //

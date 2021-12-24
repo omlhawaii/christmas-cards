@@ -113,7 +113,7 @@ function init() {
   camera.position.z = 1800;
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x2e3c55);
+  scene.background = new THREE.Color(0x0D1118);
 
   const light = new THREE.DirectionalLight(0xffffff);
   light.position.set(0, 0, 1);
@@ -175,7 +175,7 @@ function init() {
     back: "./img/elfa_b.png",
     position: new THREE.Vector3(-350, -200, -10),
     portrait: new THREE.Vector3(-200, -400, -10),
-    rotate: 0.3,
+    rotate: 0.1,
     radius: 60,
   });
 

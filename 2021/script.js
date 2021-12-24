@@ -152,7 +152,7 @@ function init() {
     rotate: 0.015,
   });
   ornament({
-    front: "./img/image(4).png",
+    front: "./img/image(10).png",
     back: "./img/image(6).png",
     position: new THREE.Vector3(-250, 150, 10),
     rotate: 0.02,
@@ -173,10 +173,10 @@ function init() {
   ornament({
     front: "./img/elfa_1.png",
     back: "./img/elfa_b.png",
-    position: new THREE.Vector3(-350, -200, -10),
-    portrait: new THREE.Vector3(-200, -400, -10),
+    position: new THREE.Vector3(-350, -150, -50),
+    portrait: new THREE.Vector3(-200, -400, -50),
     rotate: 0.1,
-    radius: 60,
+    radius: 100,
   });
 
   document.addEventListener("mousemove", onDocumentMouseMove);

@@ -12,30 +12,38 @@
       rel="stylesheet"
       href="https://threejs.org/examples/main.css"
     />
+    <style>
+      .center {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      aside {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      h2 {
+        color: white;
+        font-family: "Segoe Script", cursive;
+        text-shadow: 0 1px 2px #000000aa;
+        font-size: min(5vh, 5vw);
+        line-height: 1.5em;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-    <script type="x-shader/x-vertex" id="vertexshader">
-      attribute float scale;
-
-      void main() {
-      	vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-
-      	gl_PointSize = scale * (300.0 / - mvPosition.z);
-      	gl_Position = projectionMatrix * mvPosition;
-      }
-    </script>
-
-    <script type="x-shader/x-fragment" id="fragmentshader">
-      uniform vec3 color;
-
-      void main() {
-      	if (length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475) discard;
-
-      	gl_FragColor = vec4(color, 1.0 );
-      }
-    </script>
-
     <script type="module" src="script.js"></script>
+
+    <aside class="center">
+      <h2>
+        ☃️ Mele Kalikimaka and Happy Holidays<br />
+        from Oakes Management 🎄
+      </h2>
+    </aside>
 
     <div id="container"></div>
   </body>

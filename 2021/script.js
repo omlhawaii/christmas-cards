@@ -128,12 +128,12 @@ function init() {
 
   const loader = new THREE.CubeTextureLoader();
   const skyboxTexture = loader.load([
-    'creek_skybox/posx.jpg',
-    'creek_skybox/negx.jpg',
-    'creek_skybox/posy.jpg',
-    'creek_skybox/negy.jpg',
-    'creek_skybox/posz.jpg',
-    'creek_skybox/negz.jpg',
+    'star_skybox.png',
+    'star_skybox.png',
+    'star_skybox.png',
+    'star_skybox.png',
+    'star_skybox.png',
+    'star_skybox.png',
   ]);
   scene.background = skyboxTexture;
 

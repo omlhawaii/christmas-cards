@@ -141,7 +141,7 @@ function init() {
     front: "./img/image.png",
     back: "./img/image(1).png",
     radius: 70,
-    rotate: 0.1,
+    rotate: 0.05,
     position: new THREE.Vector3(0, -50, 100),
   });
   ornament({
@@ -149,25 +149,26 @@ function init() {
     back: "./img/image(3).png",
     position: new THREE.Vector3(250, 10, 0),
     portrait: new THREE.Vector3(150, 300, 0),
-    rotate: 0.06,
+    rotate: 0.015,
   });
   ornament({
     front: "./img/image(4).png",
     back: "./img/image(6).png",
     position: new THREE.Vector3(-250, 150, 10),
-    rotate: 0.04,
+    rotate: 0.02,
   });
   ornament({
     front: "./img/image(5).png",
     back: "./img/image(7).png",
     position: new THREE.Vector3(110, -200, -100),
+    rotate: 0.025,
   });
   ornament({
     front: "./img/image(8).png",
     back: "./img/image(9).png",
     position: new THREE.Vector3(-170, -100, -100),
     radius: 70,
-    rotate: 0.07
+    rotate: 0.035
   });
   ornament({
     front: "./img/elfa_1.png",
